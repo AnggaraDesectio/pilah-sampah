@@ -2,69 +2,68 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pilah Sampah Pintar</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ffffff;
-            min-height: 100vh;
+            background: #f0f2f5;
+            height: 100vh;
+            width: 100vw;
             display: flex;
             justify-content: center;
             color: #333;
             overscroll-behavior: none;
+            overflow: hidden; /* Mencegah scroll halaman saat main */
         }
 
         .game-container {
             background: white;
-            border-radius: 0;
-            box-shadow: none;
-            padding: 20px;
             max-width: 800px;
             width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            padding: 15px;
+            position: relative;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #f0f0f0;
+            flex-shrink: 0; /* Header jangan mengecil */
         }
 
         .title {
-            font-size: 1.8em;
+            font-size: 1.5em;
             color: #444;
-            font-weight: bold;
+            font-weight: 800;
         }
 
         .stats {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 8px;
         }
 
         .stat-box {
             background: #f3f4f6;
             color: #333;
             border: 1px solid #e5e7eb;
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-size: 1.1em;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 1em;
             font-weight: bold;
-            min-width: 90px;
+            min-width: 70px;
             text-align: center;
         }
 
@@ -72,37 +71,31 @@
             font-size: 0.6em;
             color: #666;
             display: block;
-            margin-bottom: 2px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .controls {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+            gap: 8px;
             justify-content: center;
+            padding: 10px 0;
+            flex-shrink: 0;
         }
 
         .toggle-btn {
             background: white;
             border: 1px solid #ddd;
             color: #555;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 5px;
-        }
-
-        .toggle-btn:hover {
-            background: #f9fafb;
-            border-color: #bbb;
+            gap: 4px;
         }
 
         .toggle-btn.active {
@@ -111,383 +104,251 @@
             border-color: #4f46e5;
         }
 
+        /* --- AREA GAME DINAMIS --- */
         .game-area {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            flex: 1;
+            gap: 15px;
+            flex-grow: 1; /* Mengisi sisa ruang vertikal */
+            overflow: hidden; /* Mencegah overflow keluar container */
+            position: relative;
         }
 
         .trash-items {
             background: #f8fafc;
             border: 2px dashed #e2e8f0;
             border-radius: 15px;
-            padding: 20px;
-            min-height: 200px;
-            position: relative;
+            padding: 15px;
+            flex-grow: 1; /* Area sampah akan memanjang mengisi ruang kosong */
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            align-items: center;
-            gap: 15px;
-            align-content: center;
+            align-content: center; /* Item sampah di tengah vertikal */
+            gap: 10px;
+            overflow-y: auto; /* Kalau sampah kebanyakan, scroll di dalam kotak saja */
         }
 
         .trash-item {
             background: white;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            padding: 12px 18px;
+            padding: 10px 15px;
             cursor: grab;
-            transition: all 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             font-size: 1em;
             font-weight: 600;
             color: #333;
-            text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             touch-action: none;
-            width: auto; 
-            max-width: 180px;
             user-select: none;
-            z-index: 100; /* Pastikan sampah selalu di atas */
+            z-index: 100;
+            /* Responsif size */
+            max-width: 45%; 
         }
 
-        .trash-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: #cbd5e1;
-            z-index: 101;
-        }
-
-        .trash-item.dragging {
-            opacity: 0.5;
+        .trash-item:active {
             cursor: grabbing;
+            transform: scale(1.05);
         }
 
-        /* --- VISUALISASI TONG BARU --- */
+        /* --- TONG SAMPAH RESPONSIF --- */
         .bins-container {
             display: flex;
             flex-direction: row;
-            gap: 20px;
+            gap: 10px;
             width: 100%;
-            justify-content: space-around;
-            align-items: flex-end; /* Ratakan bawah agar tong terlihat sejajar di tanah */
-            padding-top: 20px;
+            height: auto;
+            min-height: 140px; /* Tinggi minimal tong */
+            align-items: flex-end;
+            padding-top: 10px;
+            flex-shrink: 0; /* Tong jangan gepeng */
         }
 
         .bin-wrapper {
+            flex: 1; /* Bagi rata lebar */
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 1;
             position: relative;
             transition: transform 0.2s;
+            min-width: 0; /* Mencegah flex item overflow di layar sangat kecil */
         }
 
-        /* Bagian Tutup Tong */
         .bin-lid {
-            width: 110%; /* Tutup sedikit lebih lebar */
-            height: 25px;
-            border-radius: 10px 10px 5px 5px;
-            background: #999; /* Default color */
+            width: 90%;
+            height: 15px;
+            border-radius: 8px 8px 4px 4px;
+            background: #999;
             position: relative;
             z-index: 20;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-origin: left bottom; /* Engsel di kiri bawah tutup */
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform-origin: left bottom;
+            margin-bottom: -2px; /* Nempel ke body */
         }
 
-        /* Gagang Tutup */
         .bin-lid::after {
             content: '';
             position: absolute;
-            top: -8px;
+            top: -5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30%;
-            height: 8px;
+            width: 40%;
+            height: 5px;
             background: inherit;
-            border-radius: 5px 5px 0 0;
+            border-radius: 4px 4px 0 0;
             filter: brightness(0.9);
         }
 
-        /* Bagian Badan Tong */
         .bin-body {
             width: 100%;
-            min-height: 140px;
-            border-radius: 0 0 15px 15px;
-            background: #ccc; /* Default */
+            height: 100px; /* Tinggi fix untuk body */
+            border-radius: 0 0 12px 12px;
+            background: #ccc;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 15px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.1);
-            /* Efek garis-garis plastik */
-            background-image: repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 19px,
-                rgba(0,0,0,0.03) 20px,
-                rgba(0,0,0,0.03) 21px
-            );
+            padding: 5px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
         }
 
         .bin-icon {
-            font-size: 2.5em;
+            font-size: 2em;
+            line-height: 1;
             margin-bottom: 5px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
         }
 
         .bin-label {
-            font-size: 1.1em;
+            font-size: 0.8em;
             font-weight: 800;
             color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
             text-align: center;
+            word-wrap: break-word; /* Jaga-jaga teks panjang */
+            line-height: 1.1;
         }
 
-        /* Warna Spesifik Tong */
-        .bin-organic .bin-lid, .bin-organic .bin-body {
-            background-color: #4ade80;
-            border: 2px solid #22c55e;
-        }
+        /* Warna Tong */
+        .bin-organic .bin-lid, .bin-organic .bin-body { background-color: #4ade80; border: 2px solid #22c55e; }
         .bin-organic .bin-body { border-top: none; }
         
-        .bin-anorganic .bin-lid, .bin-anorganic .bin-body {
-            background-color: #fbbf24;
-            border: 2px solid #d97706;
-        }
+        .bin-anorganic .bin-lid, .bin-anorganic .bin-body { background-color: #fbbf24; border: 2px solid #d97706; }
         .bin-anorganic .bin-body { border-top: none; }
 
-        .bin-b3 .bin-lid, .bin-b3 .bin-body {
-            background-color: #f87171;
-            border: 2px solid #dc2626;
-        }
+        .bin-b3 .bin-lid, .bin-b3 .bin-body { background-color: #f87171; border: 2px solid #dc2626; }
         .bin-b3 .bin-body { border-top: none; }
 
-
-        /* Animasi Drag Over: Tutup Terbuka */
+        /* Animasi Buka Tutup */
         .bin-wrapper.drag-over .bin-lid {
-            transform: rotate(-25deg) translateY(-10px); /* Miringkan tutup */
-            filter: brightness(1.1);
+            transform: rotate(-35deg) translateY(-5px) translateX(-5px);
+        }
+        .bin-wrapper.drag-over {
+            transform: translateY(-5px);
         }
 
-        .bin-wrapper.drag-over .bin-body {
-            filter: brightness(1.05);
-        }
-        /* --- END VISUALISASI --- */
-
-
+        /* Feedback & Overlay */
         .feedback-toast {
             position: fixed;
-            bottom: 30px;
+            top: 20px; /* Pindah ke atas biar gak ketutupan jari */
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 1.1em;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 10px 20px;
+            border-radius: 30px;
             font-weight: bold;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            z-index: 1000;
+            z-index: 2000;
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .feedback-toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
-
-        .feedback-toast.success {
-            background: #10b981;
-            color: white;
-        }
-
-        .feedback-toast.error {
-            background: #ef4444;
-            color: white;
-        }
+        
+        .feedback-toast.success { background: #10b981; color: white; }
+        .feedback-toast.error { background: #ef4444; color: white; }
 
         .overlay-guide {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: rgba(0,0,0,0.85);
-            z-index: 2000;
+            z-index: 3000;
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(4px);
+            padding: 20px;
         }
 
-        .overlay-guide.show {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .overlay-guide.show { opacity: 1; pointer-events: all; }
 
         .guide-content {
             background: white;
-            padding: 40px;
-            border-radius: 25px;
-            max-width: 550px;
-            width: 90%;
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform: translateY(20px);
-            animation: floatUp 0.4s forwards ease-out;
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes floatUp {
-            to { transform: translateY(0); }
-        }
-
-        .guide-content h2 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 2.2em;
-            font-weight: 800;
-        }
-
-        .guide-steps {
-            text-align: left;
-            margin: 25px 0;
-            padding: 25px;
-            background: #f8fafc;
-            border-radius: 15px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .guide-steps li {
-            margin-bottom: 12px;
-            color: #475569;
-            font-size: 1.1em;
-            line-height: 1.5;
+        @keyframes popUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         .start-btn {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: #2563eb;
             color: white;
             border: none;
-            padding: 15px 40px;
-            border-radius: 12px;
-            font-size: 1.2em;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
             width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
         }
 
-        .start-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5);
-        }
-
-        .shake { animation: shake 0.5s; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-10px); }
-            80% { transform: translateX(10px); }
-        }
-
-        .success-pulse { animation: successPulse 0.4s; }
-        @keyframes successPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
+        .start-btn:active { transform: scale(0.98); }
 
         .game-over {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
+            inset: 0;
+            background: rgba(0,0,0,0.9);
             z-index: 3000;
             display: none;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
+            color: white;
         }
-
         .game-over.show { display: flex; }
+        .final-score { font-size: 4em; font-weight: bold; color: #4ade80; margin: 10px 0; }
 
-        .game-over-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        /* MEDIA QUERY UNTUK LAYAR KECIL/MOBILE */
+        @media (max-height: 600px) {
+            /* Mode Landscape HP atau layar pendek */
+            .bins-container { height: 100px; min-height: 100px; }
+            .bin-body { height: 70px; }
+            .bin-icon { font-size: 1.5em; }
+            .header { padding-bottom: 5px; }
+            .trash-items { min-height: 100px; }
         }
 
-        .final-score {
-            font-size: 4em;
-            font-weight: 800;
-            color: #2563eb;
-            margin: 10px 0;
-        }
-
-        @media (max-width: 768px) {
-            /* Layout Tong Mobile: Tetap ada visualisasi tong, tapi mungkin lebih kecil */
-            .bins-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .bin-wrapper {
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .bin-lid {
-                width: 105%; 
-                height: 20px;
-            }
-
-            .bin-body {
-                min-height: 100px;
-                flex-direction: row; /* Ikon dan teks jejer samping di HP */
-                gap: 15px;
-                padding: 10px;
-                justify-content: center;
-            }
-            
-            .bin-icon {
-                font-size: 2em;
-                margin-bottom: 0;
-            }
-            
-            .bin-label {
-                font-size: 1em;
-                text-align: left;
-            }
-            
-            .header {
-                padding-bottom: 10px;
-                margin-bottom: 15px;
-            }
-            
-            .title {
-                font-size: 1.5em;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="game-container">
         <div class="header">
-            <h1 class="title">🌱 Pilah Sampah</h1>
+            <div class="title">🌱 PilahSampah</div>
             <div class="stats">
                 <div class="stat-box">
                     <span class="stat-label">Skor</span>
@@ -501,25 +362,18 @@
         </div>
 
         <div class="controls">
-            <button class="toggle-btn active" id="soundToggle">
-                <span>🔊</span> <span>Musik & Suara</span>
-            </button>
-            <button class="toggle-btn active" id="hapticToggle">
-                <span>📳</span> <span>Getaran</span>
-            </button>
-            <button class="toggle-btn" id="helpToggle">
-                <span>❓</span> <span>Panduan</span>
-            </button>
+            <button class="toggle-btn active" id="soundToggle">🔊 Suara</button>
+            <button class="toggle-btn active" id="hapticToggle">📳 Getar</button>
+            <button class="toggle-btn" id="helpToggle">❓ Bantuan</button>
         </div>
 
         <div class="game-area">
             <div class="trash-items" id="trashItems">
-                <!-- Items will be generated here -->
+                <!-- Sampah muncul di sini -->
             </div>
 
-            <!-- Struktur Tong Sampah Baru -->
             <div class="bins-container">
-                <!-- Tong Organic -->
+                <!-- Organic -->
                 <div class="bin-wrapper bin-organic" data-type="organic">
                     <div class="bin-lid"></div>
                     <div class="bin-body">
@@ -528,7 +382,7 @@
                     </div>
                 </div>
 
-                <!-- Tong Anorganic -->
+                <!-- Anorganic -->
                 <div class="bin-wrapper bin-anorganic" data-type="anorganic">
                     <div class="bin-lid"></div>
                     <div class="bin-body">
@@ -537,12 +391,12 @@
                     </div>
                 </div>
 
-                <!-- Tong B3 -->
+                <!-- B3 -->
                 <div class="bin-wrapper bin-b3" data-type="b3">
                     <div class="bin-lid"></div>
                     <div class="bin-body">
                         <div class="bin-icon">☠️</div>
-                        <div class="bin-label">B3 (KIMIA)</div>
+                        <div class="bin-label">B3</div>
                     </div>
                 </div>
             </div>
@@ -551,51 +405,47 @@
 
     <div class="feedback-toast" id="feedbackToast"></div>
 
+    <!-- Overlay Guide -->
     <div class="overlay-guide show" id="overlayGuide">
         <div class="guide-content">
-            <h2>🎮 Cara Bermain</h2>
-            <div class="guide-steps">
-                <ol>
-                    <li><strong>Seret sampah</strong> ke tong yang sesuai.</li>
-                    <li>Perhatikan <strong>Tutup Tong</strong> akan terbuka saat kamu mengarahkan sampah!</li>
-                    <li><strong>Organik:</strong> Hijau (Daun, Sisa Makanan)</li>
-                    <li><strong>Anorganik:</strong> Kuning (Plastik, Kertas)</li>
-                    <li><strong>B3:</strong> Merah (Baterai, Kimia)</li>
-                </ol>
-            </div>
-            <button class="start-btn" onclick="startGame()">Mulai Bermain (Aktifkan Suara)</button>
+            <h2 style="margin-bottom:15px; color:#333;">🎮 Cara Bermain</h2>
+            <ul style="text-align:left; margin-bottom:20px; padding-left:20px; color:#555; line-height:1.6;">
+                <li>Seret sampah ke tong yang benar.</li>
+                <li><strong>Hijau (Organik):</strong> Daun, Sisa Makanan.</li>
+                <li><strong>Kuning (Anorganik):</strong> Plastik, Kertas.</li>
+                <li><strong>Merah (B3):</strong> Baterai, Kimia.</li>
+            </ul>
+            <button class="start-btn" onclick="startGame()">Mulai Bermain</button>
         </div>
     </div>
 
+    <!-- Game Over -->
     <div class="game-over" id="gameOver">
-        <div class="game-over-content">
-            <h2>🎉 Selesai!</h2>
-            <p>Skor Akhir Kamu</p>
+        <div style="text-align:center;">
+            <h2>Waktu Habis!</h2>
+            <p>Skor Kamu</p>
             <div class="final-score" id="finalScore">0</div>
-            <button class="start-btn" onclick="restartGame()">Main Lagi</button>
+            <button class="start-btn" onclick="restartGame()" style="background: white; color: #333;">Main Lagi</button>
         </div>
     </div>
 
     <script>
         const trashData = [
-            {name: '🍌 Kulit Pisang', type: 'organic'},
-            {name: '🥤 Botol Plastik', type: 'anorganic'},
-            {name: '🔋 Baterai Bekas', type: 'b3'},
-            {name: '🍃 Daun Kering', type: 'organic'},
-            {name: '📰 Kertas Bekas', type: 'anorganic'},
-            {name: '💡 Lampu Neon', type: 'b3'},
-            {name: '🍎 Sisa Apel', type: 'organic'},
-            {name: '🥫 Kaleng Minuman', type: 'anorganic'},
-            {name: '🧴 Botol Obat', type: 'b3'},
-            {name: '🌽 Tongkol Jagung', type: 'organic'},
-            {name: '📦 Kardus Bekas', type: 'anorganic'},
-            {name: '🔬 Limbah Kimia', type: 'b3'},
-            {name: '☕ Ampas Kopi', type: 'organic'},
-            {name: '🛍️ Kantong Plastik', type: 'anorganic'},
-            {name: '🩹 Plester Bekas', type: 'b3'},
-            {name: '🦴 Tulang Ayam', type: 'organic'},
-            {name: '🥡 Styrofoam', type: 'anorganic'},
-            {name: '🧪 Cairan Pembersih', type: 'b3'}
+            {name: '🍌 Pisang', type: 'organic'},
+            {name: '🥤 Botol', type: 'anorganic'},
+            {name: '🔋 Baterai', type: 'b3'},
+            {name: '🍃 Daun', type: 'organic'},
+            {name: '📰 Koran', type: 'anorganic'},
+            {name: '💡 Lampu', type: 'b3'},
+            {name: '🍎 Apel', type: 'organic'},
+            {name: '🥫 Kaleng', type: 'anorganic'},
+            {name: '🧴 Obat', type: 'b3'},
+            {name: '🌽 Jagung', type: 'organic'},
+            {name: '📦 Kardus', type: 'anorganic'},
+            {name: '🧪 Kimia', type: 'b3'},
+            {name: '🦴 Tulang', type: 'organic'},
+            {name: '🛍️ Plastik', type: 'anorganic'},
+            {name: '🥡 Styrofoam', type: 'anorganic'}
         ];
 
         let score = 0;
@@ -605,43 +455,15 @@
         let hapticEnabled = true;
         let timerInterval;
         let currentTrash = [];
-
-        // --- AUDIO SYSTEM ---
         let audioCtx = null;
         let bgmInterval = null;
-        let bgmNoteIndex = 0;
 
-        function initAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        function startBGM() {
-            if (!soundEnabled || !audioCtx) return;
-            if (bgmInterval) clearInterval(bgmInterval);
-            const notes = [
-                {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.2},
-                {f: 523.25, d: 0.4}, {f: 392.00, d: 0.2}, {f: 329.63, d: 0.2},
-            ];
-            bgmNoteIndex = 0;
-            bgmInterval = setInterval(() => {
-                if (!soundEnabled || !gameActive) {
-                    clearInterval(bgmInterval);
-                    return;
-                }
-                const note = notes[bgmNoteIndex % notes.length];
-                playTone(note.f, 'sine', 0.1, 0.05);
-                bgmNoteIndex++;
-            }, 400);
-        }
-
-        function stopBGM() { if (bgmInterval) clearInterval(bgmInterval); }
-
-        function playTone(freq, type, duration, vol = 0.1) {
+        function playTone(freq, type, duration) {
             if (!audioCtx || !soundEnabled) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -649,15 +471,13 @@
             osc.frequency.value = freq;
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-            gain.gain.setValueAtTime(0, now);
-            gain.gain.linearRampToValueAtTime(vol, now + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-            osc.start(now);
-            osc.stop(now + duration);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
         }
 
-        function playSoundEffect(type) {
+        function playSFX(type) {
             if (!audioCtx || !soundEnabled) return;
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
@@ -665,204 +485,214 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            if (type === 'success') {
+            if (type === 'correct') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(1200, now);
-                osc.frequency.exponentialRampToValueAtTime(2000, now + 0.1);
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
-            } else if (type === 'error') {
+            } else if (type === 'wrong') {
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
                 gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'gameover') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.linearRampToValueAtTime(100, now + 1);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 1);
-                osc.start(now);
-                osc.stop(now + 1);
+                osc.stop(now + 0.3);
             }
         }
 
-        // --- GAME LOGIC ---
-        function initGame() {
-            document.getElementById('soundToggle').addEventListener('click', toggleSound);
-            document.getElementById('hapticToggle').addEventListener('click', toggleHaptic);
-            document.getElementById('helpToggle').addEventListener('click', showHelp);
-
-            const bins = document.querySelectorAll('.bin-wrapper');
-            bins.forEach(bin => {
-                bin.addEventListener('dragover', handleDragOver);
-                bin.addEventListener('drop', handleDrop);
-                bin.addEventListener('dragleave', handleDragLeave);
-            });
+        function startBGM() {
+            if (!soundEnabled || !audioCtx) return;
+            if (bgmInterval) clearInterval(bgmInterval);
+            let noteIdx = 0;
+            // Pola nada sederhana
+            const notes = [330, 392, 523, 392]; 
+            bgmInterval = setInterval(() => {
+                if(!gameActive) return;
+                playTone(notes[noteIdx % 4], 'triangle', 0.1);
+                noteIdx++;
+            }, 500);
         }
 
-        function startGame() {
-            initAudioContext();
-            document.getElementById('overlayGuide').classList.remove('show');
-            gameActive = true;
-            score = 0;
-            timeLeft = 60;
-            updateScore();
-            updateTimer();
-            generateTrash();
-            startTimer();
-            startBGM();
-        }
+        function stopBGM() { clearInterval(bgmInterval); }
 
         function generateTrash() {
             const container = document.getElementById('trashItems');
             container.innerHTML = '';
-            currentTrash = [];
-            const shuffled = [...trashData].sort(() => Math.random() - 0.5);
-            const selected = shuffled.slice(0, 6);
-            selected.forEach((item, index) => {
-                const trashElement = document.createElement('div');
-                trashElement.className = 'trash-item';
-                trashElement.draggable = true;
-                trashElement.textContent = item.name;
-                trashElement.dataset.type = item.type;
-                trashElement.addEventListener('dragstart', handleDragStart);
-                trashElement.addEventListener('dragend', handleDragEnd);
-                trashElement.addEventListener('touchstart', handleTouchStart);
-                trashElement.addEventListener('touchmove', handleTouchMove);
-                trashElement.addEventListener('touchend', handleTouchEnd);
-                container.appendChild(trashElement);
-                currentTrash.push(item);
+            // Ambil acak
+            const shuffled = [...trashData].sort(() => Math.random() - 0.5).slice(0, 6);
+            shuffled.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'trash-item';
+                el.textContent = item.name;
+                el.dataset.type = item.type;
+                
+                // Mouse events
+                el.draggable = true;
+                el.addEventListener('dragstart', dragStart);
+                el.addEventListener('dragend', dragEnd);
+                
+                // Touch events
+                el.addEventListener('touchstart', touchStart, {passive: false});
+                el.addEventListener('touchmove', touchMove, {passive: false});
+                el.addEventListener('touchend', touchEnd);
+                
+                container.appendChild(el);
             });
         }
 
-        let draggedElement = null;
+        // Drag & Drop Desktop
+        let draggedItem = null;
+        function dragStart(e) {
+            draggedItem = e.target;
+            setTimeout(() => e.target.style.opacity = '0.5', 0);
+        }
+        function dragEnd(e) {
+            e.target.style.opacity = '1';
+            draggedItem = null;
+            document.querySelectorAll('.bin-wrapper').forEach(b => b.classList.remove('drag-over'));
+        }
+
+        // Touch Logic Mobile
         let touchClone = null;
+        let touchOrigin = null;
 
-        function handleDragStart(e) {
-            draggedElement = e.target;
-            e.target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        }
-
-        function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add('drag-over');
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('drag-over');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('drag-over');
-            if (!gameActive || !draggedElement) return;
-            const binType = e.currentTarget.dataset.type;
-            const trashType = draggedElement.dataset.type;
-            checkAnswer(binType, trashType, draggedElement, e.currentTarget);
-        }
-
-        function handleTouchStart(e) {
-            draggedElement = e.target;
+        function touchStart(e) {
+            e.preventDefault(); // Mencegah scroll saat drag
+            const touch = e.touches[0];
+            touchOrigin = e.target;
+            
+            // Buat clone visual untuk di-drag
             touchClone = e.target.cloneNode(true);
             touchClone.style.position = 'fixed';
+            touchClone.style.zIndex = '9999';
             touchClone.style.opacity = '0.9';
-            touchClone.style.width = (e.target.offsetWidth) + 'px';
             touchClone.style.pointerEvents = 'none';
-            touchClone.style.zIndex = '5000';
-            touchClone.style.transform = 'scale(1.05)';
-            touchClone.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+            touchClone.style.width = e.target.offsetWidth + 'px';
+            touchClone.style.transform = 'scale(1.1)';
+            
+            // Posisi awal
+            updateClonePos(touch.clientX, touch.clientY);
             document.body.appendChild(touchClone);
-            updateTouchClonePosition(e.touches[0]);
+            
+            // Sembunyikan asli
+            e.target.style.visibility = 'hidden';
         }
 
-        function handleTouchMove(e) {
+        function touchMove(e) {
             e.preventDefault();
-            if (touchClone) {
-                updateTouchClonePosition(e.touches[0]);
+            if(!touchClone) return;
+            const touch = e.touches[0];
+            updateClonePos(touch.clientX, touch.clientY);
+
+            // Deteksi hover di atas tong (untuk efek visual tutup terbuka)
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.bin-wrapper').forEach(b => b.classList.remove('drag-over'));
+            if(elemBelow) {
+                const bin = elemBelow.closest('.bin-wrapper');
+                if(bin) bin.classList.add('drag-over');
             }
         }
 
-        function updateTouchClonePosition(touch) {
-            if (touchClone) {
-                touchClone.style.left = (touch.clientX - touchClone.offsetWidth / 2) + 'px';
-                touchClone.style.top = (touch.clientY - touchClone.offsetHeight / 2) + 'px';
-            }
-        }
-
-        function handleTouchEnd(e) {
-            if (!touchClone) return;
+        function touchEnd(e) {
             const touch = e.changedTouches[0];
-            touchClone.style.display = 'none';
-            const target = document.elementFromPoint(touch.clientX, touch.clientY);
-            touchClone.style.display = 'block';
-            const bin = target ? target.closest('.bin-wrapper') : null;
-            if (bin) {
-                const binType = bin.dataset.type;
-                const trashType = draggedElement.dataset.type;
-                checkAnswer(binType, trashType, draggedElement, bin);
+            if(touchClone) {
+                touchClone.remove();
+                touchClone = null;
             }
-            if (touchClone && touchClone.parentNode) {
-                touchClone.parentNode.removeChild(touchClone);
+            if(touchOrigin) {
+                touchOrigin.style.visibility = 'visible';
             }
-            touchClone = null;
-            draggedElement = null;
+
+            // Cek drop target
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const bin = elemBelow ? elemBelow.closest('.bin-wrapper') : null;
+            
+            document.querySelectorAll('.bin-wrapper').forEach(b => b.classList.remove('drag-over'));
+
+            if(bin && touchOrigin) {
+                checkAnswer(bin, touchOrigin);
+            }
+            touchOrigin = null;
         }
 
-        function checkAnswer(binType, trashType, trashElement, binElement) {
-            if (binType === trashType) {
+        function updateClonePos(x, y) {
+            if(touchClone) {
+                touchClone.style.left = (x - touchClone.offsetWidth/2) + 'px';
+                touchClone.style.top = (y - touchClone.offsetHeight/2) + 'px';
+            }
+        }
+
+        // Setup Bins (Desktop Drop)
+        document.querySelectorAll('.bin-wrapper').forEach(bin => {
+            bin.addEventListener('dragover', e => {
+                e.preventDefault();
+                bin.classList.add('drag-over');
+            });
+            bin.addEventListener('dragleave', () => bin.classList.remove('drag-over'));
+            bin.addEventListener('drop', e => {
+                e.preventDefault();
+                bin.classList.remove('drag-over');
+                if(draggedItem) checkAnswer(bin, draggedItem);
+            });
+        });
+
+        function checkAnswer(binEl, itemEl) {
+            if(!gameActive) return;
+            
+            const binType = binEl.dataset.type;
+            const itemType = itemEl.dataset.type;
+
+            if(binType === itemType) {
                 score += 10;
-                showFeedback('✅ Benar!', 'success');
-                playSoundEffect('success');
-                vibrate([50]);
-                binElement.classList.add('success-pulse');
-                setTimeout(() => binElement.classList.remove('success-pulse'), 500);
+                playSFX('correct');
+                showToast('✅ Benar!', 'success');
+                if(hapticEnabled && navigator.vibrate) navigator.vibrate(50);
             } else {
                 score = Math.max(0, score - 5);
-                showFeedback('❌ Salah!', 'error');
-                playSoundEffect('error');
-                vibrate([200, 50, 200, 50, 400]);
-                trashElement.classList.add('shake');
-                setTimeout(() => trashElement.classList.remove('shake'), 500);
-                return; 
+                playSFX('wrong');
+                showToast('❌ Salah!', 'error');
+                if(hapticEnabled && navigator.vibrate) navigator.vibrate([100, 50, 100]);
             }
-            updateScore();
-            trashElement.remove();
-            if (document.querySelectorAll('.trash-item').length === 0) {
-                setTimeout(generateTrash, 300);
+            
+            document.getElementById('score').textContent = score;
+            itemEl.remove();
+
+            if(document.getElementById('trashItems').children.length === 0) {
+                setTimeout(generateTrash, 200);
             }
         }
 
-        function showFeedback(message, type) {
-            const toast = document.getElementById('feedbackToast');
-            toast.textContent = message;
-            toast.className = `feedback-toast ${type} show`;
-            setTimeout(() => toast.classList.remove('show'), 1500);
+        function showToast(msg, type) {
+            const t = document.getElementById('feedbackToast');
+            t.textContent = msg;
+            t.className = `feedback-toast show ${type}`;
+            setTimeout(() => t.classList.remove('show'), 1000);
         }
 
-        function vibrate(pattern) {
-            if (hapticEnabled && navigator.vibrate) navigator.vibrate(pattern);
-        }
-
-        function updateScore() { document.getElementById('score').textContent = score; }
-        function updateTimer() { document.getElementById('timer').textContent = timeLeft; }
-
-        function startTimer() {
+        function startGame() {
+            initAudio();
+            document.getElementById('overlayGuide').classList.remove('show');
+            document.getElementById('gameOver').classList.remove('show');
+            score = 0;
+            timeLeft = 60;
+            gameActive = true;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('timer').textContent = '60';
+            
+            generateTrash();
+            startBGM();
+            
             if(timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
-                updateTimer();
-                if (timeLeft <= 0) endGame();
+                document.getElementById('timer').textContent = timeLeft;
+                if(timeLeft <= 0) {
+                    endGame();
+                }
             }, 1000);
         }
 
@@ -870,35 +700,29 @@
             gameActive = false;
             clearInterval(timerInterval);
             stopBGM();
-            playSoundEffect('gameover');
             document.getElementById('finalScore').textContent = score;
             document.getElementById('gameOver').classList.add('show');
         }
 
         function restartGame() {
-            document.getElementById('gameOver').classList.remove('show');
             startGame();
         }
 
-        function toggleSound() {
+        // Toggles
+        document.getElementById('soundToggle').onclick = function() {
             soundEnabled = !soundEnabled;
-            const btn = document.getElementById('soundToggle');
-            btn.classList.toggle('active');
-            btn.querySelector('span:first-child').textContent = soundEnabled ? '🔊' : '🔇';
-            if (soundEnabled && gameActive) startBGM();
+            this.classList.toggle('active');
+            if(soundEnabled && gameActive) startBGM();
             else stopBGM();
-        }
-
-        function toggleHaptic() {
+        };
+        document.getElementById('hapticToggle').onclick = function() {
             hapticEnabled = !hapticEnabled;
-            const btn = document.getElementById('hapticToggle');
-            btn.classList.toggle('active');
-            btn.querySelector('span:first-child').textContent = hapticEnabled ? '📳' : '📴';
-        }
+            this.classList.toggle('active');
+        };
+        document.getElementById('helpToggle').onclick = function() {
+            document.getElementById('overlayGuide').classList.add('show');
+        };
 
-        function showHelp() { document.getElementById('overlayGuide').classList.add('show'); }
-
-        initGame();
     </script>
 </body>
 </html>

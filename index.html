@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #eef2f6;
+            background: #f8fafc; /* Background halaman sedikit abu sangat muda biar tidak silau */
             height: 100vh;
             width: 100vw;
             display: flex;
@@ -27,24 +27,20 @@
 
         .game-container {
             background: white;
-            /* Ubah max-width agar lebih luas di desktop */
-            max-width: 1200px; 
+            max-width: 1000px; /* Lebar maksimal agar tidak terlalu lebar di monitor besar */
             width: 100%;
             height: 100%;
-            /* Di layar besar, beri sedikit margin biar elegan */
-            max-height: 100vh;
             display: flex;
             flex-direction: column;
             padding: 20px;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
 
-        /* Responsive Container untuk Desktop */
         @media (min-width: 1024px) {
             .game-container {
                 height: 95vh;
-                border-radius: 20px;
+                border-radius: 25px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             }
         }
 
@@ -58,25 +54,25 @@
         }
 
         .title {
-            font-size: 1.8em;
-            color: #2d3748;
+            font-size: 1.6em;
+            color: #1e293b;
             font-weight: 800;
         }
 
         .stats {
             display: flex;
-            gap: 15px;
+            gap: 10px;
         }
 
         .stat-box {
-            background: #f8fafc;
-            color: #1e293b;
-            border: 2px solid #e2e8f0;
-            padding: 8px 15px;
-            border-radius: 12px;
-            font-size: 1.1em;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            padding: 6px 15px;
+            border-radius: 10px;
+            font-size: 1em;
             font-weight: bold;
-            min-width: 90px;
+            min-width: 80px;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -96,28 +92,23 @@
             display: flex;
             gap: 10px;
             justify-content: center;
-            padding: 15px 0;
+            padding: 10px 0;
             flex-shrink: 0;
         }
 
         .toggle-btn {
             background: white;
-            border: 2px solid #e2e8f0;
+            border: 1px solid #e2e8f0;
             color: #64748b;
             padding: 8px 16px;
             border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 700;
+            font-size: 0.85em;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .toggle-btn:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
         }
 
         .toggle-btn.active {
@@ -126,109 +117,76 @@
             border-color: #2563eb;
         }
 
-        /* --- GAME AREA LAYOUT SYSTEM --- */
+        /* --- GAME AREA --- */
         .game-area {
             display: flex;
-            /* Default Mobile: Column (Atas Bawah) */
-            flex-direction: column; 
-            gap: 20px;
+            flex-direction: column; /* Selalu Atas-Bawah, tidak berubah di desktop */
+            gap: 10px;
             flex-grow: 1;
             overflow: hidden;
             position: relative;
         }
 
-        /* --- RESPONSIVE BREAKPOINT (Desktop/Tablet Landscape) --- */
-        @media (min-width: 900px) {
-            .game-area {
-                /* Desktop: Row (Kiri Kanan) */
-                flex-direction: row; 
-                align-items: stretch;
-            }
-        }
-
-        /* --- TRASH AREA --- */
+        /* --- TRASH AREA (Tanpa Container Abu-abu) --- */
         .trash-items {
-            background: #f1f5f9;
-            border: 3px dashed #cbd5e1;
-            border-radius: 20px;
+            background: transparent; /* Transparan */
+            border: none; /* Hapus border */
+            box-shadow: none; /* Hapus shadow */
             padding: 20px;
-            flex-grow: 1; /* Mengisi ruang tersisa */
+            flex-grow: 1;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-content: center;
-            gap: 15px;
-            overflow-y: auto;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        /* Di desktop, trash items area lebih lebar */
-        @media (min-width: 900px) {
-            .trash-items {
-                flex: 3; /* Mengambil 3 bagian lebar */
-                height: 100%;
-            }
+            gap: 20px;
+            overflow-y: auto; /* Scroll jika sampah menumpuk */
         }
 
         .trash-item {
             background: white;
             border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 15px 20px;
+            border-radius: 16px;
+            padding: 12px 20px;
             cursor: grab;
             transition: transform 0.2s, box-shadow 0.2s;
             font-size: 1.1em;
-            font-weight: 700;
+            font-weight: 600;
             color: #334155;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Shadow item dipertegas agar terlihat floating */
             touch-action: none;
             user-select: none;
             z-index: 100;
             max-width: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             text-align: center;
         }
 
         .trash-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-            border-color: #94a3b8;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+            border-color: #cbd5e1;
+            z-index: 101;
         }
 
         .trash-item:active {
             cursor: grabbing;
-            transform: scale(1.05);
+            transform: scale(0.95);
         }
 
         /* --- BINS CONTAINER --- */
         .bins-container {
             display: flex;
-            /* Default Mobile: Row (Kiri Kanan di Bawah) */
-            flex-direction: row; 
+            flex-direction: row; /* Selalu sejajar ke samping */
             gap: 15px;
             width: 100%;
-            min-height: 150px;
+            /* Tinggi dinamis, tapi jangan terlalu tinggi */
+            height: auto;
+            min-height: 160px; 
             align-items: flex-end;
+            padding-top: 20px;
             flex-shrink: 0;
-            padding-top: 10px;
-        }
-
-        /* Di Desktop, bins jadi kolom di kanan */
-        @media (min-width: 900px) {
-            .bins-container {
-                flex-direction: column; /* Menumpuk Vertikal */
-                flex: 1; /* Mengambil 1 bagian lebar */
-                height: 100%;
-                min-height: auto;
-                width: auto;
-                align-items: stretch; /* Isi lebar penuh kolom */
-                padding-top: 0;
-                padding-left: 10px;
-                justify-content: center; /* Center secara vertikal */
-            }
+            /* Batasi lebar bins agar tidak terlalu renggang di layar lebar */
+            max-width: 900px;
+            margin: 0 auto; /* Center horizontal */
         }
 
         .bin-wrapper {
@@ -241,28 +199,17 @@
             min-width: 0;
         }
 
-        /* Desktop adjustment for bin wrapper */
-        @media (min-width: 900px) {
-            .bin-wrapper {
-                flex-direction: row; /* Icon di kiri, Teks di kanan (Opsional, atau tetap vertikal) */
-                /* Kita buat tetap vertikal tapi visualnya menyesuaikan */
-                flex-direction: column;
-                justify-content: center;
-                margin-bottom: 10px;
-            }
-            .bin-wrapper:last-child { margin-bottom: 0; }
-        }
-
         .bin-lid {
-            width: 90%;
-            height: 18px;
-            border-radius: 8px 8px 4px 4px;
+            width: 95%;
+            height: 20px;
+            border-radius: 10px 10px 4px 4px;
             background: #94a3b8;
             position: relative;
             z-index: 20;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: left bottom;
             margin-bottom: -2px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
         }
 
         .bin-lid::after {
@@ -280,8 +227,8 @@
 
         .bin-body {
             width: 100%;
-            height: 100px; /* Mobile height */
-            border-radius: 0 0 16px 16px;
+            height: 120px;
+            border-radius: 0 0 20px 20px;
             background: #e2e8f0;
             position: relative;
             display: flex;
@@ -292,23 +239,10 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
         }
 
-        /* Desktop Height for Bin Body - Make them taller/flexible */
-        @media (min-width: 900px) {
-            .bin-body {
-                height: auto;
-                flex-grow: 1; /* Isi tinggi yang tersedia */
-                min-height: 120px;
-            }
-            /* Lid adjustment for desktop visual consistency */
-            .bin-lid {
-                width: 95%;
-            }
-        }
-
         .bin-icon {
             font-size: 2.5em;
             line-height: 1;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
         }
 
@@ -321,7 +255,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Specific Colors */
+        /* Warna Tong */
         .bin-organic .bin-lid, .bin-organic .bin-body { background-color: #4ade80; border: 3px solid #22c55e; }
         .bin-organic .bin-body { border-top: none; }
         
@@ -336,33 +270,34 @@
             transform: rotate(-45deg) translateY(-10px) translateX(-5px);
         }
         .bin-wrapper.drag-over {
-            transform: translateY(-5px) scale(1.02);
+            transform: translateY(-10px);
         }
 
         /* --- FEEDBACK & OVERLAY --- */
         .feedback-toast {
             position: fixed;
-            top: 30px;
+            top: 80px;
             left: 50%;
-            transform: translateX(-50%) translateY(-100px);
+            transform: translateX(-50%) translateY(-50px);
             padding: 12px 30px;
             border-radius: 50px;
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.1em;
             z-index: 2000;
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            pointer-events: none;
         }
 
         .feedback-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .feedback-toast.success { background: #22c55e; color: white; }
+        .feedback-toast.success { background: #10b981; color: white; }
         .feedback-toast.error { background: #ef4444; color: white; }
 
         .overlay-guide {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(255,255,255,0.95); /* Putih bersih transparan */
             z-index: 3000;
             display: flex;
             justify-content: center;
@@ -370,7 +305,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px);
             padding: 20px;
         }
 
@@ -379,18 +314,19 @@
         .guide-content {
             background: white;
             padding: 40px;
-            border-radius: 25px;
+            border-radius: 30px;
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+            transform: scale(0.95);
             transition: transform 0.3s;
         }
         .overlay-guide.show .guide-content { transform: scale(1); }
 
         .start-btn {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
             border: none;
             padding: 15px 40px;
@@ -400,7 +336,7 @@
             cursor: pointer;
             width: 100%;
             margin-top: 25px;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.3);
             transition: transform 0.2s;
         }
 
@@ -410,16 +346,27 @@
         .game-over {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.85);
             z-index: 3000;
             display: none;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             color: white;
+            backdrop-filter: blur(5px);
         }
         .game-over.show { display: flex; }
-        .final-score { font-size: 5em; font-weight: 900; color: #4ade80; margin: 10px 0; text-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .final-score { font-size: 5em; font-weight: 900; color: #4ade80; margin: 15px 0; text-shadow: 0 10px 30px rgba(74, 222, 128, 0.3); }
+
+        /* MEDIA QUERY Mobile Landscape */
+        @media (max-height: 600px) {
+            .bins-container { min-height: 120px; padding-top: 10px; }
+            .bin-body { height: 80px; }
+            .bin-icon { font-size: 1.8em; margin-bottom: 5px; }
+            .header { padding-bottom: 5px; }
+            .trash-items { padding: 10px; gap: 10px; }
+            .trash-item { padding: 8px 15px; font-size: 0.9em; }
+        }
 
     </style>
 </head>
@@ -446,12 +393,12 @@
         </div>
 
         <div class="game-area">
-            <!-- Area Sampah -->
+            <!-- Area Sampah: Sekarang transparan tanpa container abu-abu -->
             <div class="trash-items" id="trashItems">
                 <!-- Sampah muncul di sini -->
             </div>
 
-            <!-- Tong Sampah -->
+            <!-- Tong Sampah: Selalu di bawah -->
             <div class="bins-container">
                 <!-- Organic -->
                 <div class="bin-wrapper bin-organic" data-type="organic">
@@ -488,10 +435,10 @@
     <!-- Overlay Guide -->
     <div class="overlay-guide show" id="overlayGuide">
         <div class="guide-content">
-            <h2 style="margin-bottom:15px; color:#1e293b; font-size:2em;">🎮 Cara Bermain</h2>
-            <div style="text-align:left; margin-bottom:20px; background:#f8fafc; padding:20px; border-radius:15px; border:1px solid #e2e8f0;">
-                <ul style="padding-left:20px; color:#475569; line-height:1.8; font-size:1.1em;">
-                    <li>Seret sampah ke tong yang benar.</li>
+            <h2 style="margin-bottom:20px; color:#1e293b; font-size:2em;">🎮 Cara Bermain</h2>
+            <div style="text-align:left; margin-bottom:25px;">
+                <ul style="padding-left:25px; color:#475569; line-height:1.8; font-size:1.1em;">
+                    <li>Seret sampah yang beterbangan ke tong yang benar.</li>
                     <li><strong>Hijau:</strong> Organik (Daun, Makanan).</li>
                     <li><strong>Kuning:</strong> Anorganik (Plastik, Kertas).</li>
                     <li><strong>Merah:</strong> B3 (Baterai, Kimia).</li>
@@ -503,9 +450,9 @@
 
     <!-- Game Over -->
     <div class="game-over" id="gameOver">
-        <div style="text-align:center; background: white; padding: 40px; border-radius: 25px; width: 90%; max-width: 400px;">
-            <h2 style="color: #333; font-size: 2em;">Waktu Habis!</h2>
-            <p style="color: #666; margin-top: 10px;">Skor Akhir Kamu</p>
+        <div style="text-align:center; background: white; padding: 40px; border-radius: 30px; width: 90%; max-width: 400px;">
+            <h2 style="color: #333; font-size: 2.2em; font-weight:800;">Waktu Habis!</h2>
+            <p style="color: #64748b; margin-top: 10px; font-size: 1.1em;">Total Skor Kamu</p>
             <div class="final-score" id="finalScore">0</div>
             <button class="start-btn" onclick="restartGame()">Main Lagi</button>
         </div>
@@ -602,8 +549,7 @@
         function generateTrash() {
             const container = document.getElementById('trashItems');
             container.innerHTML = '';
-            // Jumlah sampah disesuaikan agar tidak terlalu penuh tapi cukup
-            const count = window.innerWidth > 900 ? 8 : 6;
+            const count = window.innerWidth > 900 ? 10 : 6; // Lebih banyak sampah di desktop
             const shuffled = [...trashData].sort(() => Math.random() - 0.5).slice(0, count);
             
             shuffled.forEach(item => {
@@ -656,7 +602,12 @@
             touchClone.style.transform = 'scale(1.1)';
             touchClone.style.background = 'white';
             touchClone.style.borderRadius = '15px';
-            touchClone.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+            touchClone.style.boxShadow = '0 15px 30px rgba(0,0,0,0.2)';
+            touchClone.style.border = '2px solid #cbd5e1';
+            touchClone.textContent = e.target.textContent; // Pastikan teks ikut
+            touchClone.style.fontSize = '1.1em';
+            touchClone.style.fontWeight = 'bold';
+            touchClone.style.color = '#334155';
             
             updateClonePos(touch.clientX, touch.clientY);
             document.body.appendChild(touchClone);

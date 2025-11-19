@@ -14,136 +14,188 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
+            background: #eef2f6;
             height: 100vh;
             width: 100vw;
             display: flex;
             justify-content: center;
+            align-items: center;
             color: #333;
             overscroll-behavior: none;
-            overflow: hidden; /* Mencegah scroll halaman saat main */
+            overflow: hidden;
         }
 
         .game-container {
             background: white;
-            max-width: 800px;
+            /* Ubah max-width agar lebih luas di desktop */
+            max-width: 1200px; 
             width: 100%;
             height: 100%;
+            /* Di layar besar, beri sedikit margin biar elegan */
+            max-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 15px;
+            padding: 20px;
             position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Responsive Container untuk Desktop */
+        @media (min-width: 1024px) {
+            .game-container {
+                height: 95vh;
+                border-radius: 20px;
+            }
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             border-bottom: 2px solid #f0f0f0;
-            flex-shrink: 0; /* Header jangan mengecil */
+            flex-shrink: 0;
         }
 
         .title {
-            font-size: 1.5em;
-            color: #444;
+            font-size: 1.8em;
+            color: #2d3748;
             font-weight: 800;
         }
 
         .stats {
             display: flex;
-            gap: 8px;
+            gap: 15px;
         }
 
         .stat-box {
-            background: #f3f4f6;
-            color: #333;
-            border: 1px solid #e5e7eb;
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 1em;
+            background: #f8fafc;
+            color: #1e293b;
+            border: 2px solid #e2e8f0;
+            padding: 8px 15px;
+            border-radius: 12px;
+            font-size: 1.1em;
             font-weight: bold;
-            min-width: 70px;
+            min-width: 90px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .stat-label {
             font-size: 0.6em;
-            color: #666;
+            color: #64748b;
             display: block;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
 
         .controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
-            padding: 10px 0;
+            padding: 15px 0;
             flex-shrink: 0;
         }
 
         .toggle-btn {
             background: white;
-            border: 1px solid #ddd;
-            color: #555;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: 600;
+            border: 2px solid #e2e8f0;
+            color: #64748b;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+        }
+
+        .toggle-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
         }
 
         .toggle-btn.active {
-            background: #eef2ff;
-            color: #4f46e5;
-            border-color: #4f46e5;
+            background: #eff6ff;
+            color: #2563eb;
+            border-color: #2563eb;
         }
 
-        /* --- AREA GAME DINAMIS --- */
+        /* --- GAME AREA LAYOUT SYSTEM --- */
         .game-area {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            flex-grow: 1; /* Mengisi sisa ruang vertikal */
-            overflow: hidden; /* Mencegah overflow keluar container */
+            /* Default Mobile: Column (Atas Bawah) */
+            flex-direction: column; 
+            gap: 20px;
+            flex-grow: 1;
+            overflow: hidden;
             position: relative;
         }
 
+        /* --- RESPONSIVE BREAKPOINT (Desktop/Tablet Landscape) --- */
+        @media (min-width: 900px) {
+            .game-area {
+                /* Desktop: Row (Kiri Kanan) */
+                flex-direction: row; 
+                align-items: stretch;
+            }
+        }
+
+        /* --- TRASH AREA --- */
         .trash-items {
-            background: #f8fafc;
-            border: 2px dashed #e2e8f0;
-            border-radius: 15px;
-            padding: 15px;
-            flex-grow: 1; /* Area sampah akan memanjang mengisi ruang kosong */
+            background: #f1f5f9;
+            border: 3px dashed #cbd5e1;
+            border-radius: 20px;
+            padding: 20px;
+            flex-grow: 1; /* Mengisi ruang tersisa */
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            align-content: center; /* Item sampah di tengah vertikal */
-            gap: 10px;
-            overflow-y: auto; /* Kalau sampah kebanyakan, scroll di dalam kotak saja */
+            align-content: center;
+            gap: 15px;
+            overflow-y: auto;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        /* Di desktop, trash items area lebih lebar */
+        @media (min-width: 900px) {
+            .trash-items {
+                flex: 3; /* Mengambil 3 bagian lebar */
+                height: 100%;
+            }
         }
 
         .trash-item {
             background: white;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 10px 15px;
+            border-radius: 15px;
+            padding: 15px 20px;
             cursor: grab;
             transition: transform 0.2s, box-shadow 0.2s;
-            font-size: 1em;
-            font-weight: 600;
-            color: #333;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #334155;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             touch-action: none;
             user-select: none;
             z-index: 100;
-            /* Responsif size */
-            max-width: 45%; 
+            max-width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .trash-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            border-color: #94a3b8;
         }
 
         .trash-item:active {
@@ -151,49 +203,76 @@
             transform: scale(1.05);
         }
 
-        /* --- TONG SAMPAH RESPONSIF --- */
+        /* --- BINS CONTAINER --- */
         .bins-container {
             display: flex;
-            flex-direction: row;
-            gap: 10px;
+            /* Default Mobile: Row (Kiri Kanan di Bawah) */
+            flex-direction: row; 
+            gap: 15px;
             width: 100%;
-            height: auto;
-            min-height: 140px; /* Tinggi minimal tong */
+            min-height: 150px;
             align-items: flex-end;
+            flex-shrink: 0;
             padding-top: 10px;
-            flex-shrink: 0; /* Tong jangan gepeng */
+        }
+
+        /* Di Desktop, bins jadi kolom di kanan */
+        @media (min-width: 900px) {
+            .bins-container {
+                flex-direction: column; /* Menumpuk Vertikal */
+                flex: 1; /* Mengambil 1 bagian lebar */
+                height: 100%;
+                min-height: auto;
+                width: auto;
+                align-items: stretch; /* Isi lebar penuh kolom */
+                padding-top: 0;
+                padding-left: 10px;
+                justify-content: center; /* Center secara vertikal */
+            }
         }
 
         .bin-wrapper {
-            flex: 1; /* Bagi rata lebar */
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
             transition: transform 0.2s;
-            min-width: 0; /* Mencegah flex item overflow di layar sangat kecil */
+            min-width: 0;
+        }
+
+        /* Desktop adjustment for bin wrapper */
+        @media (min-width: 900px) {
+            .bin-wrapper {
+                flex-direction: row; /* Icon di kiri, Teks di kanan (Opsional, atau tetap vertikal) */
+                /* Kita buat tetap vertikal tapi visualnya menyesuaikan */
+                flex-direction: column;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+            .bin-wrapper:last-child { margin-bottom: 0; }
         }
 
         .bin-lid {
             width: 90%;
-            height: 15px;
+            height: 18px;
             border-radius: 8px 8px 4px 4px;
-            background: #999;
+            background: #94a3b8;
             position: relative;
             z-index: 20;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: left bottom;
-            margin-bottom: -2px; /* Nempel ke body */
+            margin-bottom: -2px;
         }
 
         .bin-lid::after {
             content: '';
             position: absolute;
-            top: -5px;
+            top: -6px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40%;
-            height: 5px;
+            width: 30%;
+            height: 6px;
             background: inherit;
             border-radius: 4px 4px 0 0;
             filter: brightness(0.9);
@@ -201,80 +280,89 @@
 
         .bin-body {
             width: 100%;
-            height: 100px; /* Tinggi fix untuk body */
-            border-radius: 0 0 12px 12px;
-            background: #ccc;
+            height: 100px; /* Mobile height */
+            border-radius: 0 0 16px 16px;
+            background: #e2e8f0;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 5px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            padding: 10px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Desktop Height for Bin Body - Make them taller/flexible */
+        @media (min-width: 900px) {
+            .bin-body {
+                height: auto;
+                flex-grow: 1; /* Isi tinggi yang tersedia */
+                min-height: 120px;
+            }
+            /* Lid adjustment for desktop visual consistency */
+            .bin-lid {
+                width: 95%;
+            }
         }
 
         .bin-icon {
-            font-size: 2em;
+            font-size: 2.5em;
             line-height: 1;
-            margin-bottom: 5px;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+            margin-bottom: 8px;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
         }
 
         .bin-label {
-            font-size: 0.8em;
+            font-size: 0.9em;
             font-weight: 800;
             color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
             text-align: center;
-            word-wrap: break-word; /* Jaga-jaga teks panjang */
-            line-height: 1.1;
+            letter-spacing: 0.5px;
         }
 
-        /* Warna Tong */
-        .bin-organic .bin-lid, .bin-organic .bin-body { background-color: #4ade80; border: 2px solid #22c55e; }
+        /* Specific Colors */
+        .bin-organic .bin-lid, .bin-organic .bin-body { background-color: #4ade80; border: 3px solid #22c55e; }
         .bin-organic .bin-body { border-top: none; }
         
-        .bin-anorganic .bin-lid, .bin-anorganic .bin-body { background-color: #fbbf24; border: 2px solid #d97706; }
+        .bin-anorganic .bin-lid, .bin-anorganic .bin-body { background-color: #facc15; border: 3px solid #ca8a04; }
         .bin-anorganic .bin-body { border-top: none; }
 
-        .bin-b3 .bin-lid, .bin-b3 .bin-body { background-color: #f87171; border: 2px solid #dc2626; }
+        .bin-b3 .bin-lid, .bin-b3 .bin-body { background-color: #f87171; border: 3px solid #dc2626; }
         .bin-b3 .bin-body { border-top: none; }
 
-        /* Animasi Buka Tutup */
+        /* Interaction */
         .bin-wrapper.drag-over .bin-lid {
-            transform: rotate(-35deg) translateY(-5px) translateX(-5px);
+            transform: rotate(-45deg) translateY(-10px) translateX(-5px);
         }
         .bin-wrapper.drag-over {
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02);
         }
 
-        /* Feedback & Overlay */
+        /* --- FEEDBACK & OVERLAY --- */
         .feedback-toast {
             position: fixed;
-            top: 20px; /* Pindah ke atas biar gak ketutupan jari */
+            top: 30px;
             left: 50%;
             transform: translateX(-50%) translateY(-100px);
-            padding: 10px 20px;
-            border-radius: 30px;
+            padding: 12px 30px;
+            border-radius: 50px;
             font-weight: bold;
+            font-size: 1.2em;
             z-index: 2000;
             opacity: 0;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
-        .feedback-toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        
-        .feedback-toast.success { background: #10b981; color: white; }
+        .feedback-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .feedback-toast.success { background: #22c55e; color: white; }
         .feedback-toast.error { background: #ef4444; color: white; }
 
         .overlay-guide {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.8);
             z-index: 3000;
             display: flex;
             justify-content: center;
@@ -282,7 +370,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
             padding: 20px;
         }
 
@@ -290,33 +378,33 @@
 
         .guide-content {
             background: white;
-            padding: 30px;
-            border-radius: 20px;
+            padding: 40px;
+            border-radius: 25px;
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             text-align: center;
-            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s;
         }
-
-        @keyframes popUp {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        .overlay-guide.show .guide-content { transform: scale(1); }
 
         .start-btn {
-            background: #2563eb;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: bold;
+            padding: 15px 40px;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: 800;
             cursor: pointer;
             width: 100%;
-            margin-top: 15px;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+            margin-top: 25px;
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+            transition: transform 0.2s;
         }
 
+        .start-btn:hover { transform: translateY(-2px); }
         .start-btn:active { transform: scale(0.98); }
 
         .game-over {
@@ -331,17 +419,7 @@
             color: white;
         }
         .game-over.show { display: flex; }
-        .final-score { font-size: 4em; font-weight: bold; color: #4ade80; margin: 10px 0; }
-
-        /* MEDIA QUERY UNTUK LAYAR KECIL/MOBILE */
-        @media (max-height: 600px) {
-            /* Mode Landscape HP atau layar pendek */
-            .bins-container { height: 100px; min-height: 100px; }
-            .bin-body { height: 70px; }
-            .bin-icon { font-size: 1.5em; }
-            .header { padding-bottom: 5px; }
-            .trash-items { min-height: 100px; }
-        }
+        .final-score { font-size: 5em; font-weight: 900; color: #4ade80; margin: 10px 0; text-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
     </style>
 </head>
@@ -368,10 +446,12 @@
         </div>
 
         <div class="game-area">
+            <!-- Area Sampah -->
             <div class="trash-items" id="trashItems">
                 <!-- Sampah muncul di sini -->
             </div>
 
+            <!-- Tong Sampah -->
             <div class="bins-container">
                 <!-- Organic -->
                 <div class="bin-wrapper bin-organic" data-type="organic">
@@ -408,24 +488,26 @@
     <!-- Overlay Guide -->
     <div class="overlay-guide show" id="overlayGuide">
         <div class="guide-content">
-            <h2 style="margin-bottom:15px; color:#333;">🎮 Cara Bermain</h2>
-            <ul style="text-align:left; margin-bottom:20px; padding-left:20px; color:#555; line-height:1.6;">
-                <li>Seret sampah ke tong yang benar.</li>
-                <li><strong>Hijau (Organik):</strong> Daun, Sisa Makanan.</li>
-                <li><strong>Kuning (Anorganik):</strong> Plastik, Kertas.</li>
-                <li><strong>Merah (B3):</strong> Baterai, Kimia.</li>
-            </ul>
+            <h2 style="margin-bottom:15px; color:#1e293b; font-size:2em;">🎮 Cara Bermain</h2>
+            <div style="text-align:left; margin-bottom:20px; background:#f8fafc; padding:20px; border-radius:15px; border:1px solid #e2e8f0;">
+                <ul style="padding-left:20px; color:#475569; line-height:1.8; font-size:1.1em;">
+                    <li>Seret sampah ke tong yang benar.</li>
+                    <li><strong>Hijau:</strong> Organik (Daun, Makanan).</li>
+                    <li><strong>Kuning:</strong> Anorganik (Plastik, Kertas).</li>
+                    <li><strong>Merah:</strong> B3 (Baterai, Kimia).</li>
+                </ul>
+            </div>
             <button class="start-btn" onclick="startGame()">Mulai Bermain</button>
         </div>
     </div>
 
     <!-- Game Over -->
     <div class="game-over" id="gameOver">
-        <div style="text-align:center;">
-            <h2>Waktu Habis!</h2>
-            <p>Skor Kamu</p>
+        <div style="text-align:center; background: white; padding: 40px; border-radius: 25px; width: 90%; max-width: 400px;">
+            <h2 style="color: #333; font-size: 2em;">Waktu Habis!</h2>
+            <p style="color: #666; margin-top: 10px;">Skor Akhir Kamu</p>
             <div class="final-score" id="finalScore">0</div>
-            <button class="start-btn" onclick="restartGame()" style="background: white; color: #333;">Main Lagi</button>
+            <button class="start-btn" onclick="restartGame()">Main Lagi</button>
         </div>
     </div>
 
@@ -454,7 +536,6 @@
         let soundEnabled = true;
         let hapticEnabled = true;
         let timerInterval;
-        let currentTrash = [];
         let audioCtx = null;
         let bgmInterval = null;
 
@@ -471,7 +552,7 @@
             osc.frequency.value = freq;
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
             osc.start();
             osc.stop(audioCtx.currentTime + duration);
@@ -489,7 +570,7 @@
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(800, now);
                 osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.setValueAtTime(0.2, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
@@ -497,7 +578,7 @@
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(150, now);
                 osc.frequency.linearRampToValueAtTime(50, now + 0.3);
-                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.setValueAtTime(0.2, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
@@ -508,11 +589,10 @@
             if (!soundEnabled || !audioCtx) return;
             if (bgmInterval) clearInterval(bgmInterval);
             let noteIdx = 0;
-            // Pola nada sederhana
             const notes = [330, 392, 523, 392]; 
             bgmInterval = setInterval(() => {
                 if(!gameActive) return;
-                playTone(notes[noteIdx % 4], 'triangle', 0.1);
+                playTone(notes[noteIdx % 4], 'triangle', 0.15);
                 noteIdx++;
             }, 500);
         }
@@ -522,20 +602,20 @@
         function generateTrash() {
             const container = document.getElementById('trashItems');
             container.innerHTML = '';
-            // Ambil acak
-            const shuffled = [...trashData].sort(() => Math.random() - 0.5).slice(0, 6);
+            // Jumlah sampah disesuaikan agar tidak terlalu penuh tapi cukup
+            const count = window.innerWidth > 900 ? 8 : 6;
+            const shuffled = [...trashData].sort(() => Math.random() - 0.5).slice(0, count);
+            
             shuffled.forEach(item => {
                 const el = document.createElement('div');
                 el.className = 'trash-item';
                 el.textContent = item.name;
                 el.dataset.type = item.type;
                 
-                // Mouse events
                 el.draggable = true;
                 el.addEventListener('dragstart', dragStart);
                 el.addEventListener('dragend', dragEnd);
                 
-                // Touch events
                 el.addEventListener('touchstart', touchStart, {passive: false});
                 el.addEventListener('touchmove', touchMove, {passive: false});
                 el.addEventListener('touchend', touchEnd);
@@ -544,7 +624,6 @@
             });
         }
 
-        // Drag & Drop Desktop
         let draggedItem = null;
         function dragStart(e) {
             draggedItem = e.target;
@@ -556,29 +635,32 @@
             document.querySelectorAll('.bin-wrapper').forEach(b => b.classList.remove('drag-over'));
         }
 
-        // Touch Logic Mobile
         let touchClone = null;
         let touchOrigin = null;
 
         function touchStart(e) {
-            e.preventDefault(); // Mencegah scroll saat drag
+            e.preventDefault();
             const touch = e.touches[0];
             touchOrigin = e.target;
             
-            // Buat clone visual untuk di-drag
             touchClone = e.target.cloneNode(true);
             touchClone.style.position = 'fixed';
             touchClone.style.zIndex = '9999';
             touchClone.style.opacity = '0.9';
             touchClone.style.pointerEvents = 'none';
             touchClone.style.width = e.target.offsetWidth + 'px';
+            touchClone.style.height = e.target.offsetHeight + 'px';
+            touchClone.style.display = 'flex';
+            touchClone.style.alignItems = 'center';
+            touchClone.style.justifyContent = 'center';
             touchClone.style.transform = 'scale(1.1)';
+            touchClone.style.background = 'white';
+            touchClone.style.borderRadius = '15px';
+            touchClone.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
             
-            // Posisi awal
             updateClonePos(touch.clientX, touch.clientY);
             document.body.appendChild(touchClone);
             
-            // Sembunyikan asli
             e.target.style.visibility = 'hidden';
         }
 
@@ -588,7 +670,6 @@
             const touch = e.touches[0];
             updateClonePos(touch.clientX, touch.clientY);
 
-            // Deteksi hover di atas tong (untuk efek visual tutup terbuka)
             const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             document.querySelectorAll('.bin-wrapper').forEach(b => b.classList.remove('drag-over'));
             if(elemBelow) {
@@ -607,7 +688,6 @@
                 touchOrigin.style.visibility = 'visible';
             }
 
-            // Cek drop target
             const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             const bin = elemBelow ? elemBelow.closest('.bin-wrapper') : null;
             
@@ -626,7 +706,6 @@
             }
         }
 
-        // Setup Bins (Desktop Drop)
         document.querySelectorAll('.bin-wrapper').forEach(bin => {
             bin.addEventListener('dragover', e => {
                 e.preventDefault();
@@ -708,7 +787,6 @@
             startGame();
         }
 
-        // Toggles
         document.getElementById('soundToggle').onclick = function() {
             soundEnabled = !soundEnabled;
             this.classList.toggle('active');
